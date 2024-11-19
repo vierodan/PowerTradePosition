@@ -1,0 +1,1 @@
+This solution has been created using "Rider" on a "Mac" laptop if you are going to run the project on a Windows laptop/computer, please be sure to change the "OutputFolderPath" entry on "appsettings.json" for meet with the file system of Windows.
