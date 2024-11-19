@@ -1,0 +1,111 @@
+# Build results
+bin/
+obj/
+out/
+build/
+
+# Rider specific files
+.idea/
+*.sln.iml
+.idea/modules.xml
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/libraries/
+.idea/.idea_modules.xml
+.idea/misc.xml
+.idea/dictionaries
+.idea/vcs.xml
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# VS Code settings
+.vscode/
+.vscode/settings.json
+
+# Rider
+.idea/
+*.sln.iml
+
+# Logs
+*.log
+
+# Temporary files
+~$*
+*.tmp
+*.temp
+
+# macOS files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# Visual Studio specific
+.vs/
+.vscode/
+*.vcxproj.user
+*.vcxproj.filters
+*.vcxproj.*
+
+# Packages
+*.nupkg
+*.snupkg
+*.nuspec
+packages/*
+!packages/build/
+
+# Uncomment if you have MSBuild targets that need to be persisted
+#!packages/build/
+
+# Include NuGet Packages directory in the solution directory if using NuGet <= 4
+# NuGet v3's project.json produces a packages directory here
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# NuGet v4: Store global packages folder in a non-repository path
+.nuget/
+
+# ASP.NET Scaffolding
+.scaffolding/
+
+# StyleCop
+StyleCopReport.xml
+
+# User-specific files (Mono Auto Generated Files)
+mono_crash.*
+
+# Windows specific
+Thumbs.db
+ehthumbs.db
+
+# Rider settings folder
+.idea/
+# Rider Workspace
+*.sln.iml
