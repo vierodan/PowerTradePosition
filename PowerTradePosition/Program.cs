@@ -82,12 +82,12 @@ public static class Program
                 rollingInterval: RollingInterval.Day);
         }
         
-        loggerConfiguration.CreateLogger();
+        ILogger logger = loggerConfiguration.CreateLogger();
 
         try
         {
-            Log.Information("Application starting...");
-            var host = CreateHostBuilder(args, configuration).Build();
+            logger.Information("Application starting...");
+            var host = CreateHostBuilder(args, configuration, logger).Build();
             await host.RunAsync();
         }
         catch (Exception ex)
@@ -101,7 +101,7 @@ public static class Program
         
     }
 
-    private static IHostBuilder CreateHostBuilder(string[] args, IConfiguration configuration) =>
+    private static IHostBuilder CreateHostBuilder(string[] args, IConfiguration configuration, ILogger logger) =>
         Host.CreateDefaultBuilder(args)
             .UseSerilog()
             .ConfigureServices((context, services) =>
@@ -109,6 +109,7 @@ public static class Program
                 services.AddHostedService<PowerTradeBackgroundService>();
                 services.AddSingleton<PowerService>();
                 services.AddSingleton(configuration);
+                services.AddSingleton(logger);
             });
 
     private static LogEventLevel CalculateLogLevel(int level)
