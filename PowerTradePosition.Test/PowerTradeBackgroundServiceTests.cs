@@ -57,9 +57,14 @@ public class PowerTradeBackgroundServiceTests
         _mockLogger.Verify(logger => logger.Information(It.Is<string>(s => s.Contains("Aggregate positions per hour"))), Times.Once);
         _mockLogger.Verify(logger => logger.Information(It.Is<string>(s => s.Contains("Extract generated successfully:"))), Times.Once);
         _mockLogger.Verify(logger => logger.Information(It.Is<string>(s => s.Contains("Writing CSV"))), Times.Once);
-        
+
         //Clean
-        Clean();
+        if (!Directory.Exists("./")) return;
+        var files = Directory.GetFiles("./", "*" + "csv");
+        foreach (var file in files)
+        {
+            File.Delete(file);
+        }
     }
 
 
@@ -83,16 +88,6 @@ public class PowerTradeBackgroundServiceTests
         _mockLogger.Verify(logger => logger.Information(It.Is<string>(s => s.Contains("Running first extract"))), Times.Once);
         _mockLogger.Verify(logger => logger.Information(It.Is<string>(s => s.Contains("Run extract"))), Times.Once);
         _mockLogger.Verify(logger => logger.Error(It.Is<Exception>(ex => ex.Message.Contains("Test exception")), It.Is<string>(s => s.Contains("Error while running extract"))), Times.AtLeastOnce);
-    }
-
-    public static void Clean()
-    {
-        if (!Directory.Exists("./")) return;
-        var files = Directory.GetFiles("./", "*" + "csv");
-        foreach (var file in files)
-        {
-            File.Delete(file);
-        }
     }
 }
 
