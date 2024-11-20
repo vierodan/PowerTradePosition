@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35431.28
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerTradePosition", "PowerTradePosition\PowerTradePosition.csproj", "{E65987F9-0696-4CDA-B3C0-E34048EBA3DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerTradePosition.Text", "PowerTradePosition.Text\PowerTradePosition.Text.csproj", "{DF200132-699B-4AC0-9FD2-BDD5011BDFDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerTradePosition.Test", "PowerTradePosition.Text\PowerTradePosition.Test.csproj", "{DF200132-699B-4AC0-9FD2-BDD5011BDFDB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
