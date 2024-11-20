@@ -92,7 +92,7 @@ public static class Program
         }
         catch (Exception ex)
         {
-            Log.Fatal(ex, "Unexpected error starting application.");
+            logger.Fatal(ex, "Unexpected error starting application.");
         }
         finally
         {
@@ -107,7 +107,7 @@ public static class Program
             .ConfigureServices((context, services) =>
             {
                 services.AddHostedService<PowerTradeBackgroundService>();
-                services.AddSingleton<PowerService>();
+                services.AddSingleton<IPowerService, PowerService>();
                 services.AddSingleton(configuration);
                 services.AddSingleton(logger);
             });
@@ -128,6 +128,3 @@ public static class Program
         return consoleLevel;
     }
 }
-
-    
-

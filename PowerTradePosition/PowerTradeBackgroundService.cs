@@ -8,39 +8,49 @@ using ILogger = Serilog.ILogger;
 
 
 namespace PowerTradePosition;
-public class PowerTradeBackgroundService(IConfiguration configuration, ILogger logger, PowerService powerService) : BackgroundService
+public class PowerTradeBackgroundService(IConfiguration configuration, ILogger logger, IPowerService powerService) : BackgroundService
 {
     private readonly ILogger _logger = logger.ForContext<PowerTradeBackgroundService>();
-    
-    private readonly int _interval = Convert.ToInt32(configuration
-        .GetSection("PowerTradeConfiguration")
-        .GetSection("IntervalMinutes").Value ?? "15");
-    
-    private readonly string _folderPath = configuration
-        .GetSection("PowerTradeConfiguration")
-        .GetSection("OutputFolderPath").Value ?? "~/avr/PowerTradeReports";
-    
-    private readonly string _timezone = configuration
-        .GetSection("PowerTradeConfiguration")
-        .GetSection("TimeZone").Value ?? "Europe/Madrid";
 
-    
+    private readonly int _interval = Convert.ToInt32(configuration
+        .GetSection("PowerTradeConfiguration:IntervalMinutes").Value);
+
+    private readonly string _folderPath = configuration
+        .GetSection("PowerTradeConfiguration:OutputFolderPath").Value ?? CreateOutputFolder();
+
+    private readonly string _timezone = configuration
+        .GetSection("PowerTradeConfiguration:TimeZone").Value ?? "Europe/Madrid";
+
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         // Run first extract immediately
         _logger.Information("Running first extract");
-        await RunExtractWithRetry(_folderPath, _timezone, stoppingToken);
+        await RunExtractWithRetry(stoppingToken);
 
         // Schedule subsequent extracts
         while (!stoppingToken.IsCancellationRequested)
         {
             await Task.Delay(TimeSpan.FromMinutes(_interval), stoppingToken);
             _logger.Information("Running next extract");
-            await RunExtractWithRetry(_folderPath, _timezone, stoppingToken);
+            await RunExtractWithRetry(stoppingToken);
         }
     }
 
-    private async Task RunExtractWithRetry(string folderPath, string timezone, CancellationToken stoppingToken)
+    private static string CreateOutputFolder()
+    {
+        var rootPath = AppDomain.CurrentDomain.BaseDirectory;
+        var folderName = "PowerTradeReports";
+        var folderPath = Path.Combine(rootPath, folderName);
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+
+        return folderPath;
+    }
+
+    private async Task RunExtractWithRetry(CancellationToken stoppingToken)
     {
         var retryPolicy = Policy
             .Handle<Exception>()
@@ -51,11 +61,11 @@ public class PowerTradeBackgroundService(IConfiguration configuration, ILogger l
 
         await retryPolicy.ExecuteAsync(async () =>
         {
-            await RunExtract(folderPath, timezone, stoppingToken);
+            await RunExtract(stoppingToken);
         });
     }
 
-    private async Task RunExtract(string folderPath, string timezone, CancellationToken stoppingToken)
+    private async Task RunExtract(CancellationToken stoppingToken)
     {
         try
         {
@@ -64,12 +74,12 @@ public class PowerTradeBackgroundService(IConfiguration configuration, ILogger l
             var trades = await powerService.GetTradesAsync(referenceDate);
 
             // Aggregate positions per hour
-            var aggregatedPositions = AggregateTrades(trades, timezone);
+            var aggregatedPositions = AggregateTrades(trades);
 
             // Write to CSV
             var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmm");
             var filename = $"PowerPosition_{referenceDate:yyyyMMdd}_{timestamp}.csv";
-            var filePath = Path.Combine(folderPath, filename);
+            var filePath = Path.Combine(_folderPath, filename);
             WriteToCsv(filePath, aggregatedPositions);
             _logger.Information($"Extract generated successfully: {filePath}");
         }
@@ -80,12 +90,12 @@ public class PowerTradeBackgroundService(IConfiguration configuration, ILogger l
         }
     }
 
-    private List<(DateTime DateTime, double Volume)> AggregateTrades(IEnumerable<PowerTrade> trades, string timezone)
+    private List<(DateTime DateTime, double Volume)> AggregateTrades(IEnumerable<PowerTrade> trades)
     {
-        var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timezone);
+        var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(_timezone);
         _logger.Information("Aggregate positions per hour");
         return trades
-            .SelectMany(powerTrade => 
+            .SelectMany(powerTrade =>
                 powerTrade.Periods.Select(powerPeriod => new
                 {
                     DateTime = TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(powerTrade.Date.Date.AddHours(powerPeriod.Period - 1), DateTimeKind.Unspecified), timeZoneInfo),
