@@ -2,9 +2,8 @@ using Axpo;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Serilog;
-using Xunit.Sdk;
 
-namespace PowerTradePosition.Text;
+namespace PowerTradePosition.Test;
 
 public class PowerTradeBackgroundServiceTests
 {
